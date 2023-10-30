@@ -1,0 +1,8 @@
+name: ShamaPass
+main: fr.igortha.shamaPass.Main
+version: 1.0.0
+author: iGorTha
+description: XP management plugin
+commands:
+  xp:
+    description: Xp management command

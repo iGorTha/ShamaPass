@@ -1,0 +1,17 @@
+
+config:
+  enabled-plugin: true
+
+
+permissions:
+  base-permissions: "shama-pass."
+  admin: 'admin'
+  command-xp: "command.xp"
+
+messages:
+  command-error: "&c[✖] You must be a player to run this command"
+  command-permission: "&c[✖] You don't have permission to make this command"
+  found-player: "&c[✖] An error has occurred - we haven't found the player!"
+  invalid-player: "&c[✖] The first argument must be a valid player."
+
+

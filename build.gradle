@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'fr.jj136975'
+group = 'fr.igortha'
 version = '1.0-SNAPSHOT'
 
 repositories {

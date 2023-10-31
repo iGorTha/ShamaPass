@@ -2,13 +2,6 @@
 config:
   enabled-plugin: true
 
-  db-connect:
-    host: ""
-    port: 0
-    database: ""
-    username: ""
-    password: ""
-
 permissions:
   base-permissions: "shama-pass."
   admin: 'admin'

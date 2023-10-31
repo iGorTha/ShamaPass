@@ -7,7 +7,7 @@ group 'fr.ifortha.shamaPass'
 version '1.0-SNAPSHOT'
 
 compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
+    sourceCompatibility = targetCompatibility = '17'
     options.encoding = 'UTF-8'
 }
 
@@ -30,9 +30,8 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
-    maven {
-        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
-    }
+    maven {url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'}
+    maven { url = 'https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc'}
 }
 
 jar {
@@ -46,6 +45,8 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly 'me.clip:placeholderapi:2.11.5'
+    compileOnly group: 'org.xerial', name: 'sqlite-jdbc', version: '3.43.2.2'
+
 }
 
 
@@ -53,3 +54,5 @@ shadowJar {
     archiveClassifier.set('')
     minimize()
 }
+sourceCompatibility = JavaVersion.VERSION_15
+targetCompatibility = JavaVersion.VERSION_15

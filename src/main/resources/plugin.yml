@@ -3,6 +3,8 @@ main: fr.igortha.shamaPass.Main
 version: 1.0.0
 author: iGorTha
 description: XP management plugin
+depend:
+  - PlaceholderAPI
 commands:
   xp:
     description: Xp management command

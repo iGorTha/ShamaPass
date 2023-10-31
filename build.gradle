@@ -6,7 +6,6 @@ plugins {
 group 'fr.ifortha.shamaPass'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
     sourceCompatibility = targetCompatibility = '1.8'
     options.encoding = 'UTF-8'
@@ -31,6 +30,9 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
+    maven {
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
 }
 
 jar {
@@ -43,6 +45,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     compileOnly 'org.spigotmc:spigot:1.12.2-R0.1-SNAPSHOT'
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    compileOnly 'me.clip:placeholderapi:2.11.5'
 }
 
 

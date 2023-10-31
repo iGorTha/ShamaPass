@@ -3,10 +3,10 @@ package fr.igortha.shamaPass.placeholder;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.jetbrains.annotations.NotNull;
 
-public class XpPlaceHolder extends PlaceholderExpansion {
+public class XpPassPlaceHolder extends PlaceholderExpansion {
     @Override
     public @NotNull String getIdentifier() {
-        return "player_xp";
+        return "player_pass_level";
     }
 
     @Override

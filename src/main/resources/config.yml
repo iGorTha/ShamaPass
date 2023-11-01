@@ -1,17 +1,87 @@
+#////////////////////////////////////////////////////////////////////////
+# Author : iGorTha
+# Name Plugin : ShamaPass
+# Please read all the comments to avoid making mistakes and breaking the plugin.
+# If you have any problems, please contact iGorTha via discord for technical support.
+#///////////////////////////////////////////////////////////////////////
 
+########################################################################
+
+
+#General plugin configuration.
 config:
+
+  #Deactivates the plugin at server startup.
   enabled-plugin: true
+
+  #Allows you to set the maximum number of xp you can have.
   max-xp: 5000
 
+
+
+########################################################################
+
+
+
+#Permssion management.
 permissions:
+
+  #Main permission example => shama-pass [permission].
   base-permissions: "shama-pass."
-  admin: 'admin'
+
+  #Permission to use the /xp command.
   command-xp: "command.xp"
 
+
+
+########################################################################
+
+
+#Message management on the server.
 messages:
+
+  #Message sent when the player is not an entity requested.
   command-error: "&c[✖] You must be a player to run this command"
+
+  #Message sent when the player is not allowed to make this command.
   command-permission: "&c[✖] You don't have permission to make this command"
+
+  #Message sent when player not found / not online.
   found-player: "&c[✖] An error has occurred - we haven't found the player!"
-  invalid-player: "&c[✖] The first argument must be a valid player."
+
+  #Message sent when player exceeds xp limit.
+  over-the-limit: "&cYou will exceed the xp limit of => {maxXP}"
+
+  #Message sent when you add xp to a player.
+  add-xp: "&aYou've just added {xp} XP to {player}"
+
+  #Message sent when you withdraw xp from a player.
+  remove-xp: "&cYou have just withdrawn {xp} XP from kylian"
+
+  #Message sent when a player wins a level.
+  level-up: "&aCongratulations {player}, you've just passed level {level}."
+
+  #Message sent when a player loses a level.
+  level-down: "&cYou have just lost a level, you are level {level}."
+
+  #Message sent when player switches to negative number.
+  below-the-limit: "&c[✖] You can't deduct any points from him, as the player would drop below 0."
+
+  #Message sent when order is misused.
+  use-command: "&c[✖] Incorrect usage: /command addpoints | removepoints | getpoints <player> ? <number>."
+
+  #Send message to see player's level number.
+  number-level: "&aThe player {player} is level {level}"
+
+  #Send message to see player's level number.
+  number-xp: "&aThe player {player} has {xp} xp"
+
+  #Message sent when an argument send is incorrect.
+  args-number: "&c[✖] The third argument must be a whole number"
+
+
+
+########################################################################
+
 
 

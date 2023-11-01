@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class XpPlaceHolder extends PlaceholderExpansion {
-
     @Override
     public @NotNull String getIdentifier() {
         return "shama";

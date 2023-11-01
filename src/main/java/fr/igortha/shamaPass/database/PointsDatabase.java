@@ -4,7 +4,6 @@ import fr.igortha.shamaPass.Main;
 import fr.igortha.shamaPass.utils.Logger;
 import org.bukkit.entity.Player;
 
-import java.rmi.MarshalledObject;
 import java.sql.*;
 public class PointsDatabase {
     private Connection connection;
@@ -87,7 +86,9 @@ public class PointsDatabase {
         int remainingPoints = points;
 
         if (currentPoints + remainingPoints >= maxXP) {
-            Logger.send(player, "Vous ne pouvez pas dépasser la limite de points : " + maxXP);
+            Logger.send(player, Main.getInstance().getConfig().getString("messages.over-the-limit")
+                    .replace("maxXP", String.valueOf(maxXP)
+                    ));
             return;
         }
 
@@ -112,15 +113,21 @@ public class PointsDatabase {
             e.printStackTrace();
         }
 
-        Logger.send(player, "Vous venez d'ajouter " + points + " points à " + target.getName());
+        Logger.send(player, Main.getInstance().getConfig().getString("messages.add-xp")
+                .replace("{xp}", String.valueOf(points))
+                .replace("{player}", target.getName())
+        );
         if (newLevel > currentLevel) {
-            Logger.send(player, "Félicitations, " + target.getName() + " est maintenant au niveau " + newLevel);
+            Logger.send(target, Main.getInstance().getConfig().getString("messages.level-up")
+                    .replace("{player}", target.getName())
+                    .replace("{level}", String.valueOf(newLevel)
+                    ));
         }
     }
 
     public void removePoints(Player player, Player target, int points) {
         if (!playerExists(target)) {
-            Logger.send(player, "Player not found!");
+            Logger.send(player, Main.getInstance().getConfig().getString("messages.found-player"));
             return;
         }
 
@@ -128,6 +135,7 @@ public class PointsDatabase {
         int newPoints = currentPoints - points;
 
         int newLevel = getLevel(target);
+        int oldLevel = newLevel;
 
         while (newPoints < newLevel * 100) {
             newLevel--;
@@ -138,7 +146,7 @@ public class PointsDatabase {
         }
 
         if (newPoints < 0) {
-            Logger.send(player, "Le joueur passerait en négatif si vous lui retirez des points !");
+            Logger.send(player, Main.getInstance().getConfig().getString("messages.below-the-limit"));
             return;
         }
 
@@ -151,7 +159,13 @@ public class PointsDatabase {
             e.printStackTrace();
         }
 
-        Logger.send(player, "Vous venez d'enlever " + points + " points à " + target.getName() + " (Nouveau niveau : " + newLevel + ")");
+        Logger.send(player, Main.getInstance().getConfig().getString("messages.remove-xp").replace("{xp}", String.valueOf(points)));
+
+        if (oldLevel != newLevel) {
+            Logger.send(target, Main.getInstance().getConfig().getString("messages.level-down")
+                    .replace("{level}", String.valueOf(newLevel)
+                    ));
+        }
     }
 
     public int getPoint(Player target) {

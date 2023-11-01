@@ -2,13 +2,10 @@ package fr.igortha.shamaPass;
 
 import fr.igortha.shamaPass.commands.XpCommand;
 import fr.igortha.shamaPass.database.PointsDatabase;
-import fr.igortha.shamaPass.placeholder.XpPassPlaceHolder;
 import fr.igortha.shamaPass.placeholder.XpPlaceHolder;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.sql.SQLException;
 
 public class Main extends JavaPlugin {
     //////////////INSTANCE///////////////////
@@ -39,17 +36,10 @@ public class Main extends JavaPlugin {
             return;
         }
         ///////////////////CONNECT_DB//////////////////////////
-        try {
-            if (!getDataFolder().exists())
-                getDataFolder().mkdirs();
-
-            this.pointsDatabase = new PointsDatabase(getDataFolder().getAbsolutePath() + "/points.db");
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            this.getLogger().severe("Failed to connect to the dartabase! " + exception.getSQLState());
-            this.setEnabled(false);
-            return;
-        }
+        if (!getDataFolder().exists())
+            getDataFolder().mkdirs();
+        this.pointsDatabase = new PointsDatabase();
+        this.pointsDatabase.connect();
 
         //////////////////////////////////////////////////////
 
@@ -58,7 +48,6 @@ public class Main extends JavaPlugin {
         //////////////////////////////////////////////////////
 
         ///////////////////PLACEHOLDER////////////////////////
-        new XpPassPlaceHolder().register();
         new XpPlaceHolder().register();
         //////////////////////////////////////////////////////
 
@@ -68,12 +57,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         ///////////////////DISCONNECT_DB//////////////////////
-        try {
-            this.pointsDatabase.closeConnection();
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-        }
-
+        this.pointsDatabase.closeConnection();
         //////////////////////////////////////////////////////
 
         this.getLogger().info("ShamaPass disabled!");
@@ -83,4 +67,5 @@ public class Main extends JavaPlugin {
         getCommand("xp").setExecutor(new XpCommand());
         this.getLogger().info("ShamaPass loaded commands!");
     }
+
 }

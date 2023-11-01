@@ -3,72 +3,110 @@ package fr.igortha.shamaPass.database;
 
 import fr.igortha.shamaPass.Main;
 import fr.igortha.shamaPass.utils.Logger;
+import lombok.extern.java.Log;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
-
 public class PointsDatabase {
-    private final Connection connection;
+    private Connection connection;
 
-    public PointsDatabase(String path) throws SQLException {
-        this.connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-        try (Statement statement = this.connection.createStatement()) {
-            statement.execute("CREATE TABLE IF NOT EXISTS players (" +
+    public PointsDatabase() {
+        connect();
+    }
+
+    public void connect() {
+        try {
+            if (connection != null && !connection.isClosed()) {
+                return;
+            }
+
+            connection = DriverManager.getConnection("jdbc:sqlite:" + Main.getInstance().getDataFolder().getAbsolutePath() + "/points.db");
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS players (" +
                     "uuid TEXT PRIMARY KEY, " +
                     "username TEXT NOT NULL," +
                     "points INTEGER NOT NULL DEFAULT 0," +
                     "levels INTEGER NOT NULL DEFAULT 0)");
+
             Main.getInstance().getLogger().info("Database connected!");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public void closeConnection() throws SQLException {
-        if (this.connection != null && !this.connection.isClosed()) {
-            this.connection.close();
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            this.connect();
+        }
+        return connection;
+    }
+
+    public void closeConnection() {
+        try {
+            getConnection().close();
             Main.getInstance().getLogger().info("Database connection closed!");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public boolean playerExists(Player player) throws SQLException {
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT * FROM players WHERE uuid = ?")) {
+    public boolean playerExists(Player player) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("SELECT 1 FROM players WHERE uuid = ? LIMIT 1")) {
             preparedStatement.setString(1, player.getUniqueId().toString());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.next();
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public void addPlayer(Player player) throws SQLException {
+    public void addPlayer(Player player) {
         if (!playerExists(player)) {
-            try (PreparedStatement preparedStatement = this.connection.prepareStatement("INSERT OR IGNORE INTO players (uuid, username) VALUES (?, ?)")) {
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT OR IGNORE INTO players (uuid, username) VALUES (?, ?)")) {
                 preparedStatement.setString(1, player.getUniqueId().toString());
                 preparedStatement.setString(2, player.getDisplayName());
                 preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public void addPoints(Player player, Player target, int points) throws SQLException {
-        if (!this.playerExists(target)) {
-            this.addPlayer(target);
+    public void addPoints(Player player, Player target, int points) {
+        if (!playerExists(target)) {
+            addPlayer(target);
         }
 
         int currentPoints = getPoint(player, target);
         int newPoints = currentPoints + points;
 
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
+        int maxPoints = 2147483647;
+
+        if (newPoints >= maxPoints) {
+            Logger.send(player, "Vous ne pouvez pas dépasser la limite de point : " + newPoints);
+            return;
+        }
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
             preparedStatement.setInt(1, newPoints);
             preparedStatement.setString(2, target.getUniqueId().toString());
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         Logger.send(player, "Vous venez d'ajouter " + points + " points à " + target.getName());
     }
-    public void removePoints(Player player, Player target, int points) throws SQLException {
-        if (!this.playerExists(target)) {
+
+    public void removePoints(Player player, Player target, int points) {
+
+        if (!playerExists(target)) {
             Logger.send(player, "Player not found!");
             return;
         }
 
-        int currentPoints = this.getPoint(player, target);
+        int currentPoints = getPoint(player, target);
         int newPoints = currentPoints - points;
 
         if (newPoints < 0) {
@@ -76,38 +114,41 @@ public class PointsDatabase {
             return;
         }
 
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
             preparedStatement.setInt(1, newPoints);
             preparedStatement.setString(2, target.getUniqueId().toString());
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         Logger.send(player, "Vous venez d'enlever " + points + " points à " + target.getName());
     }
 
-    public int getPoint(Player player, Player target) throws SQLException {
-        if (!this.playerExists(target)) {
+    public int getPoint(Player player, Player target) {
+        if (!playerExists(target)) {
             Logger.send(player, "Player not found!");
             return 0;
         }
 
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT points FROM players WHERE uuid =?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("SELECT points FROM players WHERE uuid = ?")) {
             preparedStatement.setString(1, target.getUniqueId().toString());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("points");
-            } else {
-                return 0;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next() ? resultSet.getInt("points") : 0;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
-    public int getLevel(Player player, Player target) throws SQLException {
+    public int getLevel(Player player, Player target) {
         if (!this.playerExists(target)) {
             Logger.send(player, "Player not found!");
             return 0;
         }
 
-        try (PreparedStatement preparedStatement = this.connection.prepareStatement("SELECT levels FROM players WHERE uuid =?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("SELECT levels FROM players WHERE uuid =?")) {
             preparedStatement.setString(1, target.getUniqueId().toString());
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -115,6 +156,8 @@ public class PointsDatabase {
             } else {
                 return 0;
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

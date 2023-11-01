@@ -3,7 +3,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-group 'fr.ifortha.shamaPass'
+group 'fr.igortha.shamaPass'
 version '1.0-SNAPSHOT'
 
 compileJava {

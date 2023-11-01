@@ -20,7 +20,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onLoad() {
         instance = this;
-        this.getLogger().info("ShamaPass loaded!");
+        this.getLogger().info(this.getName() + " loaded!");
     }
 
     @Override
@@ -54,7 +54,7 @@ public class Main extends JavaPlugin {
         //////////////////////////////////////////////////////
 
         this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&8----------------------------------------------------"));
-        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aShamaPass enabled!"));
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&a" + this.getName() + " enabled!"));
         this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&7Plugin version: " + getDescription().getVersion()));
         this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&7Author: " + getDescription().getAuthors().toString()));
         this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&8----------------------------------------------------"));
@@ -66,12 +66,12 @@ public class Main extends JavaPlugin {
         this.pointsDatabase.closeConnection();
         //////////////////////////////////////////////////////
 
-        this.getLogger().info("ShamaPass disabled!");
+        this.getLogger().info(this.getName() + " disabled!");
     }
 
     public void loadCommand() {
         getCommand("xp").setExecutor(new XpCommand());
-        this.getLogger().info("ShamaPass loaded commands!");
+        this.getLogger().info(this.getName() + " loaded commands!");
     }
 
 }

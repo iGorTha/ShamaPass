@@ -56,7 +56,7 @@ messages:
   add-xp: "&aYou've just added {xp} XP to {player}"
 
   #Message sent when you withdraw xp from a player.
-  remove-xp: "&cYou have just withdrawn {xp} XP from kylian"
+  remove-xp: "&cYou have just withdrawn {xp} XP from {player}"
 
   #Message sent when a player wins a level.
   level-up: "&aCongratulations {player}, you've just passed level {level}."

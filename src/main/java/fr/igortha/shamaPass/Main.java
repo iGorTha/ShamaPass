@@ -4,7 +4,9 @@ import fr.igortha.shamaPass.commands.XpCommand;
 import fr.igortha.shamaPass.database.PointsDatabase;
 import fr.igortha.shamaPass.placeholder.XpPlaceHolder;
 import lombok.Getter;
+import me.clip.placeholderapi.libs.kyori.adventure.platform.facet.Facet;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
@@ -51,7 +53,11 @@ public class Main extends JavaPlugin {
         new XpPlaceHolder().register();
         //////////////////////////////////////////////////////
 
-        this.getLogger().info("ShamaPass enabled!");
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&8----------------------------------------------------"));
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aShamaPass enabled!"));
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&7Plugin version: " + getDescription().getVersion()));
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&7Author: " + getDescription().getAuthors().toString()));
+        this.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&8----------------------------------------------------"));
     }
 
     @Override

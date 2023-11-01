@@ -85,7 +85,7 @@ public class PointsDatabase {
 
         int remainingPoints = points;
 
-        if (currentPoints + remainingPoints >= maxXP) {
+        if (currentPoints + remainingPoints > maxXP) {
             Logger.send(player, Main.getInstance().getConfig().getString("messages.over-the-limit")
                     .replace("maxXP", String.valueOf(maxXP)
                     ));
@@ -163,6 +163,7 @@ public class PointsDatabase {
 
         if (oldLevel != newLevel) {
             Logger.send(target, Main.getInstance().getConfig().getString("messages.level-down")
+                    .replace("{player}", target.getName())
                     .replace("{level}", String.valueOf(newLevel)
                     ));
         }

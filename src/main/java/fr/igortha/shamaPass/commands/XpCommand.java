@@ -62,7 +62,7 @@ public class XpCommand implements CommandExecutor, TabCompleter {
                 }
                 int numberPoints = Main.getInstance().getPointsDatabase().getPoint(targetPlayer);
                 Logger.send(player, Main.getInstance().getConfig().getString("messages.number-xp")
-                        .replace("player", targetPlayer.getName())
+                        .replace("{player}", targetPlayer.getName())
                         .replace("{xp}", String.valueOf(numberPoints))
                 );
             } else if (args[1].equalsIgnoreCase("getLevels")) {

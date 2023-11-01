@@ -10,64 +10,90 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class XpCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             Logger.send(sender, Main.getInstance().getConfig().getString("messages.command-error"));
             return true;
         }
 
-        Player player = (Player) sender;
-
-        if (!Permissions.hasPermission(sender, Permissions.COMMAND_XP)) {
+        if (!Permissions.hasPermission(player, Permissions.COMMAND_XP)) {
             Logger.send(player, Main.getInstance().getConfig().getString("messages.command-permission"));
             return true;
         }
 
-        if (args.length == 1) {
-            List<String> tabCompletions = onTabComplete(player, cmd, label, args);
-            if (tabCompletions.isEmpty()) {
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.command-invalid-player"));
-                return true;
-            }
-            String playerName = tabCompletions.get(0);
-            Player targetPlayer = Bukkit.getPlayer(playerName);
+        if (args.length >= 2) {
+            String playerName = args[0];
+            Player targetPlayer = Bukkit.getPlayerExact(playerName);
+
             if (targetPlayer == null) {
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.command-found-player"));
+                Logger.send(player, "Le joueur spécifié n'est pas en ligne ou n'existe pas.");
                 return true;
             }
 
+            if (args[1].equalsIgnoreCase("addpoints")) {
+                if (args.length == 3) {
+                    String arg2 = args[2];
+                    try {
+                        int points = Integer.parseInt(arg2);
+                        Main.getInstance().getPointsDatabase().addPoints(player, targetPlayer, points);
+                    } catch (NumberFormatException e) {
+                        Logger.send(player, "Le troisième argument doit être un nombre entier.");
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (args[1].equalsIgnoreCase("removepoints")) {
+                if (args.length == 3) {
+                    String arg2 = args[2];
+                    try {
+                        int points = Integer.parseInt(arg2);
+                        Main.getInstance().getPointsDatabase().removePoints(player, targetPlayer, points);
+                    } catch (NumberFormatException e) {
+                        Logger.send(player, "Le troisième argument doit être un nombre entier.");
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else if (args[1].equalsIgnoreCase("getpoints")) {
+                try {
+                    int numberPoints = Main.getInstance().getPointsDatabase().getPoint(player, targetPlayer);
+                    Logger.send(player, "Le joueur " + targetPlayer.getName() + " a " + numberPoints);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Logger.send(player, "Utilisation incorrecte : /commande addpoints | removepoints | getpoints <joueur> <nombre>");
+            }
             return true;
         }
-
         return false;
     }
+
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         List<String> completions = new ArrayList<>();
 
         if (args.length == 1) {
-            String valueToComplete = args[0];
-            UUID uuid = null;
-            try {
-                uuid = UUID.fromString(valueToComplete);
-            } catch (IllegalArgumentException ignored) {
-            }
+            String valueToComplete = args[0].toLowerCase();
 
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                String playerName = onlinePlayer.getName();
+                String playerName = onlinePlayer.getName().toLowerCase();
 
-                boolean started = playerName.toLowerCase().startsWith(valueToComplete.toLowerCase());
-                if ((uuid != null && started) || (uuid == null && started)) {
-                    completions.add(playerName);
+                if (playerName.startsWith(valueToComplete)) {
+                    completions.add(onlinePlayer.getName());
                 }
             }
+        } else if (args.length == 2) {
+            completions.add("addpoints");
+            completions.add("removepoints");
+            completions.add("getpoints");
         }
         return completions;
     }

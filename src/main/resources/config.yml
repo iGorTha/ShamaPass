@@ -1,6 +1,7 @@
 
 config:
   enabled-plugin: true
+  max-xp: 5000
 
 permissions:
   base-permissions: "shama-pass."

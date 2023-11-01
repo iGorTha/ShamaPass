@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class XpCommand implements CommandExecutor, TabCompleter {
-    /*@Override
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!(sender instanceof Player player)) {
             Logger.send(sender, Main.getInstance().getConfig().getString("messages.command-error"));
@@ -39,6 +39,7 @@ public class XpCommand implements CommandExecutor, TabCompleter {
                 if (args.length == 3) {
                     String arg2 = args[2];
                     try {
+                        Main.getInstance().getLogger().severe("Player : " + player.getName());
                         int points = Integer.parseInt(arg2);
                         Main.getInstance().getPointsDatabase().addPoints(player, targetPlayer, points);
                     } catch (NumberFormatException e) {
@@ -56,10 +57,18 @@ public class XpCommand implements CommandExecutor, TabCompleter {
                     }
                 }
             } else if (args[1].equalsIgnoreCase("getpoints")) {
-                int numberPoints = Main.getInstance().getPointsDatabase().getPoint(player, targetPlayer);
+                if (!Main.getInstance().getPointsDatabase().playerExists(targetPlayer)) {
+                    Logger.send(player, "Player not found!");
+                    return false;
+                }
+                int numberPoints = Main.getInstance().getPointsDatabase().getPoint(targetPlayer);
                 Logger.send(player, "Le joueur " + targetPlayer.getName() + " a " + numberPoints);
             } else if (args[1].equalsIgnoreCase("getLevels")) {
-                int numberLevels = Main.getInstance().getPointsDatabase().getLevel(player, targetPlayer);
+                if (!Main.getInstance().getPointsDatabase().playerExists(targetPlayer)) {
+                    Logger.send(player, "Player not found!");
+                    return false;
+                }
+                int numberLevels = Main.getInstance().getPointsDatabase().getLevel(targetPlayer);
                 Logger.send(player, "Le joueur " + targetPlayer.getName() + " a " + numberLevels);
             } else {
                 Logger.send(player, "Utilisation incorrecte : /commande addpoints | removepoints | getpoints <joueur> <nombre>");
@@ -67,63 +76,7 @@ public class XpCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         return false;
-    }*/
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            Logger.send(sender, Main.getInstance().getConfig().getString("messages.command-error"));
-            return true;
-        }
-
-        if (!Permissions.hasPermission(player, Permissions.COMMAND_XP)) {
-            Logger.send(player, Main.getInstance().getConfig().getString("messages.command-permission"));
-            return true;
-        }
-
-        if (args.length >= 2) {
-            String playerName = args[0];
-            Player targetPlayer = Bukkit.getPlayerExact(playerName);
-
-            if (targetPlayer == null) {
-                Logger.send(player, "Le joueur spécifié n'est pas en ligne ou n'existe pas.");
-                return true;
-            }
-
-            String subCommand = args[1].toLowerCase();
-
-            switch (subCommand) {
-                case "addpoints":
-                case "removepoints":
-                    if (args.length == 3) {
-                        String arg2 = args[2];
-                        try {
-                            int points = Integer.parseInt(arg2);
-                            if (subCommand.equals("addpoints")) {
-                                Main.getInstance().getPointsDatabase().addPoints(player, targetPlayer, points);
-                            } else {
-                                Main.getInstance().getPointsDatabase().removePoints(player, targetPlayer, points);
-                            }
-                        } catch (NumberFormatException e) {
-                            Logger.send(player, "Le troisième argument doit être un nombre entier.");
-                        }
-                    }
-                    break;
-                case "getpoints":
-                    int numberPoints = Main.getInstance().getPointsDatabase().getPoint(player, targetPlayer);
-                    Logger.send(player, "Le joueur " + targetPlayer.getName() + " a " + numberPoints);
-                    break;
-                case "getlevels":
-                    int numberLevels = Main.getInstance().getPointsDatabase().getLevel(player, targetPlayer);
-                    Logger.send(player, "Le joueur " + targetPlayer.getName() + " a " + numberLevels);
-                    break;
-                default:
-                    Logger.send(player, "Utilisation incorrecte : /commande addpoints | removepoints | getpoints | getlevels <joueur> <nombre>");
-            }
-            return true;
-        }
-        return false;
     }
-
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
@@ -137,6 +90,7 @@ public class XpCommand implements CommandExecutor, TabCompleter {
 
                 if (playerName.startsWith(valueToComplete)) {
                     completions.add(onlinePlayer.getName());
+                    Main.getInstance().getLogger().severe("Player : " + playerName);
                 }
             }
         } else if (args.length == 2) {

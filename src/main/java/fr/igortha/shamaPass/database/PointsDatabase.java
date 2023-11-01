@@ -1,11 +1,10 @@
 package fr.igortha.shamaPass.database;
 
-
 import fr.igortha.shamaPass.Main;
 import fr.igortha.shamaPass.utils.Logger;
-import lombok.extern.java.Log;
 import org.bukkit.entity.Player;
 
+import java.rmi.MarshalledObject;
 import java.sql.*;
 public class PointsDatabase {
     private Connection connection;
@@ -65,7 +64,7 @@ public class PointsDatabase {
         if (!playerExists(player)) {
             try (PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT OR IGNORE INTO players (uuid, username) VALUES (?, ?)")) {
                 preparedStatement.setString(1, player.getUniqueId().toString());
-                preparedStatement.setString(2, player.getDisplayName());
+                preparedStatement.setString(2, player.getName());
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -78,59 +77,84 @@ public class PointsDatabase {
             addPlayer(target);
         }
 
-        int currentPoints = getPoint(player, target);
-        int newPoints = currentPoints + points;
+        ///////////////////VARIABLES/////////////////////////
+        int currentPoints = getPoint(target);
+        int maxXP = Main.getInstance().getConfig().getInt("config.max-xp");
+        int currentLevel = getLevel(target);
+        int newLevel = currentLevel;
+        /////////////////////////////////////////////////////
 
-        int maxPoints = 2147483647;
+        int remainingPoints = points;
 
-        if (newPoints >= maxPoints) {
-            Logger.send(player, "Vous ne pouvez pas dépasser la limite de point : " + newPoints);
+        if (currentPoints + remainingPoints >= maxXP) {
+            Logger.send(player, "Vous ne pouvez pas dépasser la limite de points : " + maxXP);
             return;
         }
 
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
-            preparedStatement.setInt(1, newPoints);
-            preparedStatement.setString(2, target.getUniqueId().toString());
+        while (remainingPoints > 0) {
+            if (currentPoints + remainingPoints >= (newLevel + 1) * 100) {
+                int pointsToAdd = ((newLevel + 1) * 100) - currentPoints;
+                currentPoints += pointsToAdd;
+                remainingPoints -= pointsToAdd;
+                newLevel++;
+            } else {
+                currentPoints += remainingPoints;
+                remainingPoints = 0;
+            }
+        }
+
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ?, levels = ? WHERE uuid = ?")) {
+            preparedStatement.setInt(1, currentPoints);
+            preparedStatement.setInt(2, newLevel);
+            preparedStatement.setString(3, target.getUniqueId().toString());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         Logger.send(player, "Vous venez d'ajouter " + points + " points à " + target.getName());
+        if (newLevel > currentLevel) {
+            Logger.send(player, "Félicitations, " + target.getName() + " est maintenant au niveau " + newLevel);
+        }
     }
 
     public void removePoints(Player player, Player target, int points) {
-
         if (!playerExists(target)) {
             Logger.send(player, "Player not found!");
             return;
         }
 
-        int currentPoints = getPoint(player, target);
+        int currentPoints = getPoint(target);
         int newPoints = currentPoints - points;
+
+        int newLevel = getLevel(target);
+
+        while (newPoints < newLevel * 100) {
+            newLevel--;
+            if (newLevel < 0) {
+                newLevel = 0;
+                break;
+            }
+        }
 
         if (newPoints < 0) {
             Logger.send(player, "Le joueur passerait en négatif si vous lui retirez des points !");
             return;
         }
 
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ? WHERE uuid = ?")) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement("UPDATE players SET points = ?, levels = ? WHERE uuid = ?")) {
             preparedStatement.setInt(1, newPoints);
-            preparedStatement.setString(2, target.getUniqueId().toString());
+            preparedStatement.setInt(2, newLevel);
+            preparedStatement.setString(3, target.getUniqueId().toString());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        Logger.send(player, "Vous venez d'enlever " + points + " points à " + target.getName());
+        Logger.send(player, "Vous venez d'enlever " + points + " points à " + target.getName() + " (Nouveau niveau : " + newLevel + ")");
     }
 
-    public int getPoint(Player player, Player target) {
-        if (!playerExists(target)) {
-            Logger.send(player, "Player not found!");
-            return 0;
-        }
-
+    public int getPoint(Player target) {
         try (PreparedStatement preparedStatement = getConnection().prepareStatement("SELECT points FROM players WHERE uuid = ?")) {
             preparedStatement.setString(1, target.getUniqueId().toString());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -142,12 +166,7 @@ public class PointsDatabase {
         }
     }
 
-    public int getLevel(Player player, Player target) {
-        if (!this.playerExists(target)) {
-            Logger.send(player, "Player not found!");
-            return 0;
-        }
-
+    public int getLevel(Player target) {
         try (PreparedStatement preparedStatement = getConnection().prepareStatement("SELECT levels FROM players WHERE uuid =?")) {
             preparedStatement.setString(1, target.getUniqueId().toString());
             ResultSet resultSet = preparedStatement.executeQuery();

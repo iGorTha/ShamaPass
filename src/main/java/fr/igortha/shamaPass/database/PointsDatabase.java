@@ -117,6 +117,11 @@ public class PointsDatabase {
                 .replace("{xp}", String.valueOf(points))
                 .replace("{player}", target.getName())
         );
+
+        Logger.send(target, Main.getInstance().getConfig().getString("messages.target-add-xp")
+                .replace("{xp}", String.valueOf(points))
+        );
+
         if (newLevel > currentLevel) {
             Logger.send(target, Main.getInstance().getConfig().getString("messages.level-up")
                     .replace("{player}", target.getName())
@@ -160,6 +165,10 @@ public class PointsDatabase {
         }
 
         Logger.send(player, Main.getInstance().getConfig().getString("messages.remove-xp").replace("{xp}", String.valueOf(points)));
+
+        Logger.send(target, Main.getInstance().getConfig().getString("messages.target-remove-xp")
+                .replace("{xp}", String.valueOf(points))
+        );
 
         if (oldLevel != newLevel) {
             Logger.send(target, Main.getInstance().getConfig().getString("messages.level-down")

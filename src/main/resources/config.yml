@@ -55,8 +55,14 @@ messages:
   #Message sent when you add xp to a player.
   add-xp: "&aYou've just added {xp} XP to {player}"
 
+  #Message sent to player when XP are received
+  target-add-xp: "&aYou have just received {xp} XP"
+
   #Message sent when you withdraw xp from a player.
   remove-xp: "&cYou have just withdrawn {xp} XP from {player}"
+
+  #Message sent to player when xp are removed
+  target-remove-xp: "&cYou just lost {xp} XP"
 
   #Message sent when a player wins a level.
   level-up: "&aCongratulations {player}, you've just passed level {level}."
@@ -68,7 +74,7 @@ messages:
   below-the-limit: "&c[✖] You can't deduct any points from him, as the player would drop below 0."
 
   #Message sent when order is misused.
-  use-command: "&c[✖] Incorrect usage: /command addpoints | removepoints | getpoints <player> ? <number>."
+  use-command: "&c[✖] Incorrect usage: /xp <player> addpoints | removepoints | getpoints ? <number>."
 
   #Send message to see player's level number.
   number-level: "&aThe player {player} is level {level}"
@@ -82,6 +88,3 @@ messages:
 
 
 ########################################################################
-
-
-

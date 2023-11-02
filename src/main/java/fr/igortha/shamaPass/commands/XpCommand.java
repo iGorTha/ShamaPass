@@ -95,7 +95,6 @@ public class XpCommand implements CommandExecutor, TabCompleter {
 
                 if (playerName.startsWith(valueToComplete)) {
                     completions.add(onlinePlayer.getName());
-                    Main.getInstance().getLogger().severe("Player : " + playerName);
                 }
             }
         } else if (args.length == 2) {

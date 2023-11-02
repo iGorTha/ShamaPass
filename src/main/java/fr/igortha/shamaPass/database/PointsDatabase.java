@@ -164,7 +164,11 @@ public class PointsDatabase {
             e.printStackTrace();
         }
 
-        Logger.send(player, Main.getInstance().getConfig().getString("messages.remove-xp").replace("{xp}", String.valueOf(points)));
+        Logger.send(player, Main.getInstance().getConfig().getString("messages.remove-xp")
+                .replace("{xp}", String.valueOf(points))
+                .replace("{player}", target.getName())
+
+        );
 
         Logger.send(target, Main.getInstance().getConfig().getString("messages.target-remove-xp")
                 .replace("{xp}", String.valueOf(points))

@@ -2,6 +2,7 @@ package fr.igortha.shamaPass.database;
 
 import fr.igortha.shamaPass.Main;
 import fr.igortha.shamaPass.utils.Logger;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.sql.*;
@@ -71,7 +72,7 @@ public class PointsDatabase {
         }
     }
 
-    public void addPoints(Player player, Player target, int points) {
+    public void addPoints(CommandSender player, Player target, int points) {
         if (!playerExists(target)) {
             addPlayer(target);
         }
@@ -130,7 +131,7 @@ public class PointsDatabase {
         }
     }
 
-    public void removePoints(Player player, Player target, int points) {
+    public void removePoints(CommandSender player, Player target, int points) {
         if (!playerExists(target)) {
             Logger.send(player, Main.getInstance().getConfig().getString("messages.found-player"));
             return;

@@ -16,13 +16,9 @@ import java.util.List;
 public class XpCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (!(sender instanceof Player player)) {
-            Logger.send(sender, Main.getInstance().getConfig().getString("messages.command-error"));
-            return true;
-        }
 
-        if (!Permissions.hasPermission(player, Permissions.COMMAND_XP)) {
-            Logger.send(player, Main.getInstance().getConfig().getString("messages.command-permission"));
+        if (!Permissions.hasPermission(sender, Permissions.COMMAND_XP)) {
+            Logger.send(sender, Main.getInstance().getConfig().getString("messages.command-permission"));
             return true;
         }
 
@@ -31,7 +27,7 @@ public class XpCommand implements CommandExecutor, TabCompleter {
             Player targetPlayer = Bukkit.getPlayerExact(playerName);
 
             if (targetPlayer == null) {
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.found-player"));
+                Logger.send(sender, Main.getInstance().getConfig().getString("messages.found-player"));
                 return true;
             }
 
@@ -40,9 +36,9 @@ public class XpCommand implements CommandExecutor, TabCompleter {
                     String arg2 = args[2];
                     try {
                         int points = Integer.parseInt(arg2);
-                        Main.getInstance().getPointsDatabase().addPoints(player, targetPlayer, points);
+                        Main.getInstance().getPointsDatabase().addPoints(sender, targetPlayer, points);
                     } catch (NumberFormatException e) {
-                        Logger.send(player, Main.getInstance().getConfig().getString("messages.args-number"));
+                        Logger.send(sender, Main.getInstance().getConfig().getString("messages.args-number"));
                     }
                 }
             } else if (args[1].equalsIgnoreCase("removepoints")) {
@@ -50,33 +46,33 @@ public class XpCommand implements CommandExecutor, TabCompleter {
                     String arg2 = args[2];
                     try {
                         int points = Integer.parseInt(arg2);
-                        Main.getInstance().getPointsDatabase().removePoints(player, targetPlayer, points);
+                        Main.getInstance().getPointsDatabase().removePoints(sender, targetPlayer, points);
                     } catch (NumberFormatException e) {
-                        Logger.send(player, Main.getInstance().getConfig().getString("messages.args-number"));
+                        Logger.send(sender, Main.getInstance().getConfig().getString("messages.args-number"));
                     }
                 }
             } else if (args[1].equalsIgnoreCase("getpoints")) {
                 if (!Main.getInstance().getPointsDatabase().playerExists(targetPlayer)) {
-                    Logger.send(player, Main.getInstance().getConfig().getString("messages.found-player"));
+                    Logger.send(sender, Main.getInstance().getConfig().getString("messages.found-player"));
                     return false;
                 }
                 int numberPoints = Main.getInstance().getPointsDatabase().getPoint(targetPlayer);
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.number-xp")
+                Logger.send(sender, Main.getInstance().getConfig().getString("messages.number-xp")
                         .replace("{player}", targetPlayer.getName())
                         .replace("{xp}", String.valueOf(numberPoints))
                 );
             } else if (args[1].equalsIgnoreCase("getLevels")) {
                 if (!Main.getInstance().getPointsDatabase().playerExists(targetPlayer)) {
-                    Logger.send(player, Main.getInstance().getConfig().getString("messages.found-player"));
+                    Logger.send(sender, Main.getInstance().getConfig().getString("messages.found-player"));
                     return false;
                 }
                 int numberLevels = Main.getInstance().getPointsDatabase().getLevel(targetPlayer);
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.number-level")
+                Logger.send(sender, Main.getInstance().getConfig().getString("messages.number-level")
                         .replace("{player}", targetPlayer.getName())
                         .replace("{level}", String.valueOf(numberLevels))
                 );
             } else {
-                Logger.send(player, Main.getInstance().getConfig().getString("messages.use-command"));
+                Logger.send(sender, Main.getInstance().getConfig().getString("messages.use-command"));
             }
             return true;
         }

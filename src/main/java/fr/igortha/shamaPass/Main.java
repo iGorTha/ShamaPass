@@ -4,7 +4,6 @@ import fr.igortha.shamaPass.commands.XpCommand;
 import fr.igortha.shamaPass.database.PointsDatabase;
 import fr.igortha.shamaPass.placeholder.XpPlaceHolder;
 import lombok.Getter;
-import me.clip.placeholderapi.libs.kyori.adventure.platform.facet.Facet;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
